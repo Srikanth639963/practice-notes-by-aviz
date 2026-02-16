@@ -1,0 +1,48 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-rolling
+spec:
+  selector:
+    app: demo-rolling
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: demo-rolling-rollout
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: demo-rolling
+  template:
+    metadata:
+      labels:
+        app: demo-rolling
+    spec:
+      containers:
+      - name: demo
+        image: nginx:stable
+        ports:
+        - containerPort: 80
+
+  strategy:
+    canary:
+      # No stableService/canaryService/trafficRouting
+      # This makes it behave like a rolling update
+      # Pods are upgraded in batches based on maxSurge/maxUnavailable
+      maxSurge: 
+      maxUnavailable: 0
+      steps:
+      - setWeight: 25
+      - pause: { duration: "30s" }
+      - setWeight: 50
+      - pause: { duration: "30s" }
+      - setWeight: 75
+      - pause: { duration: "30s" }
+      - setWeight: 100
