@@ -1,0 +1,116 @@
+
+
+CI/CD : 
+
+CI : Continuous integration : Dev team freq merge code changes into a shared repo, where automation starts..
+
+CD : Continuous Delivery : Code changes are picked, automatically build, tested and preapred for release.. A manual step/approval involved before the deployment.
+
+CD : Continuous Deployment : Code changes are picked, automatically build, tested and deploymenyed automatically.
+
+2004 --> kawaguchi developed "hudson" for Sun microsystems as an opensource project.
+2010 --> They got disputed with Oracle (sun micro acquired by orcle). They forked the project and named as "jenkins" and continued the dev work.
+
+Jenkins is rich in plugins.
+
+Preq: Java must be installed.. 
+
+
+---
+
+sudo wget -O /etc/yum.repos.d/jenkins.repo \
+    https://pkg.jenkins.io/rpm-stable/jenkins.repo
+sudo dnf upgrade
+# Add required dependencies for the jenkins package
+sudo dnf install fontconfig -y
+sudo dnf install java-21-amazon-corretto -y
+sudo dnf install jenkins -y
+sudo systemctl daemon-reload
+
+sudo systemctl enable jenkins --now
+sudo systemctl start jenkins
+sudo systemctl eanble jenkins
+
+grab the initial administartor password by running below command:
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+Install the suggested plugin.
+
+Configure your admin user.
+
+Instance Configuration: 
+Jenkins URL: http://0.0.0.0:8080/
+
+--
+
+To fix low /tmp storage issue in jenkins nodes, adjust the threshould.
+
+Navigate to "settings" --> "Nodes" --> Select node and "configure" --> Enable "Disk Space Monitoring Thresholds" and adjust this to lower values. 
+
+--
+
+A job/item is a runnable task, we use this task to connect to repo, build the code and deploy to the servers.
+
+========
+
+Environemnt Variable : THis helps to store and reuse values.
+
+Local variables : varibaled defines inside job.
+
+NAME=Avinash
+COURSE=jenkins
+echo "Hello, This is $NAME and Welcome to my $COURSE"
+
+--
+
+System variables / GLobal variables : Defined at jenkins system level.. Can be used in any project/pipeline.
+
+Manage jenkins --> system --> Global properties --> env variables
+PROJECT=DevSecOpsproject
+OWNER=Avinash
+
+echo "Hello, This is for $PROJECT and THis $PROJECT is owned by $OWNER"
+
+## Local variables will takes effect when conflict occurs with system variabled.
+
+--
+
+Jenkins Build-in variables: jenkins defaultly provides build-in env variables. we can access using below url. 
+
+http://3.110.98.198:8080/env-vars.html/
+
+
+echo "This pipeline is to display jenkins build-in varaibles. This build id is $BUILD_ID this created for a job $JOB_NAME this is running inside a $NODE_NAME in ${WORKSPACE}"
+
+========
+
+Build Trigger Options :
+
+Build Manually : You manually trigger the build to run the job.
+
+Build periodically : Runs on a particular interval. This uses cron syntax.
+
+Poll SCM : Periuodically checks the repo for code changes based on given interval, If any change occured, then it triggers the build.
+
+
+Github Webhook : No periodical checks, Pipeline triggers based on commit/push happend on the git repo.
+
+PayloadURL: http://3.110.98.198:8080/github-webhook/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
