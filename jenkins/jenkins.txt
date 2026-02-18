@@ -90,7 +90,7 @@ Build Manually : You manually trigger the build to run the job.
 
 Build periodically : Runs on a particular interval. This uses cron syntax.
 
-Poll SCM : Periuodically checks the repo for code changes based on given interval, If any change occured, then it triggers the build.
+Poll SCM : Periodically checks the repo for code changes based on given interval, If any change occured, then it triggers the build.
 
 
 Github Webhook : No periodical checks, Pipeline triggers based on commit/push happend on the git repo.
@@ -98,6 +98,25 @@ Github Webhook : No periodical checks, Pipeline triggers based on commit/push ha
 PayloadURL: http://3.110.98.198:8080/github-webhook/
 
 
+========
+
+D: 18/02/2026
+
+Number of executors : The maximum number of concurrent builds that Jenkins may perform on this node.
+
+Throttle builds at job level : Enforces a minimum time between builds based on the desired maximum rate.
+Note: this does not enforce an "average" rate, it only looks at the time since last build.
+
+
+Launch a ec2 instance to use as node. Install "java" and "git". 
+
+Connect to it and create a directory : "/var/jenkins-agent"
+chmod 777 jenkins-agent
+
+
+==========
+
+User Management in Jenkins: 
 
 
 
