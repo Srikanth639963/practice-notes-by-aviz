@@ -107,7 +107,6 @@ Number of executors : The maximum number of concurrent builds that Jenkins may p
 Throttle builds at job level : Enforces a minimum time between builds based on the desired maximum rate.
 Note: this does not enforce an "average" rate, it only looks at the time since last build.
 
-
 Launch a ec2 instance to use as node. Install "java" and "git". 
 
 Connect to it and create a directory : "/var/jenkins-agent"
@@ -118,18 +117,232 @@ chmod 777 jenkins-agent
 
 User Management in Jenkins: 
 
+Default
+Matric
+Role based auth : 
+
+==========
+
+D: 19/02/2026
+
+
+Maven : Maven is a build and project management tool, primarily used in java based projects.
+
+Dependency Management : Automatically fetches libraries and their sub depends (Transitive Dependencies)
+Build Management : Compile, test and package
+Standardised Structure : All project structures looks same
+free & opensource : 
+Reprodusable build: same output across the machines.
+plugin ecosystem : Hundred of the pulgins avaibale in market.
+
+Java: maven, ant, gradle
+js : npm
+python: pybuilder
+php: composer
+c/c++ : make
+
+JAR: Java ARchieve : A JAR file bundles compiled java .class files and its metadata into a single compressed file for distribution.
+JAR includes the compiled .class files of a Java project.
+
+WAR : Web Application Archieve : This packages a complete Java Web applicaiton for deployment on a webserver i.e; apache tomcat.
+A WAR file includes all the components of a web application, such as servlets, JavaServer
+Pages (JSPs), HTML files, JavaScript files, and images.
+
+
+Step 1 : Developer writes app.java (source code)
+Step 2 : Javac compiles app.java --> app.class (bytecode)
+Step 3 : Maven packages all .class files --> myapp.jar or myapp.war
+Step 4 : WAR is deployed to apache tomcat --> users can access it via browser.
+
+
+Download maven : 
+https://dlcdn.apache.org/maven/maven-3/3.9.12/binaries/apache-maven-3.9.12-bin.tar.gz
+
+mv apache-maven-3.9.12 /opt/
+rm apache-maven-3.9.12-bin.tar.gz 
+
+maven home : M2_HOME
+
+Now, Edit bash profile and maven home directory as path.
+
+vim ~/.bashrc
+export M2_HOME=/opt/apache-maven-3.9.12
+export PATH=$M2_HOME/bin:$PATH
+
+source ~/.bashrc
+
+---
+
+generate a sample project: mvn archetype:generate
+
+groupid: mydemoproject
+artifactid: javasimple
+version:
+package: 
+Press Y
+
+
+└── javasample
+    ├── pom.xml							(Maven config file / blueprint)
+    └── src
+        ├── main
+        │   └── java
+        │       └── mydemoproject
+        │           └── App.java		(main application code)
+        └── test
+            └── java
+                └── mydemoproject
+                    └── AppTest.java	(Unit test)
+
+8 directories, 3 files
+
+---
+
+mvn compile
+
+.
+├── pom.xml
+├── src
+│   ├── main
+│   │   └── java
+│   │       └── mydemoproject
+│   │           └── App.java
+│   └── test
+│       └── java
+│           └── mydemoproject
+│               └── AppTest.java
+└── target
+    ├── classes
+    │   └── mydemoproject
+    │       └── App.class				(Compiled bytecode)
+    ├── generated-sources
+    │   └── annotations
+    └── maven-status
+        └── maven-compiler-plugin
+            └── compile
+                └── default-compile
+                    ├── createdFiles.lst
+                    └── inputFiles.lst
+
+---
+
+mvn package
+
+
+Building jar: /home/ec2-user/javasample/target/javasample-1.0-SNAPSHOT.jar
+
+
+├── pom.xml
+├── src
+│   ├── main
+│   │   └── java
+│   │       └── mydemoproject
+│   │           └── App.java
+│   └── test
+│       └── java
+│           └── mydemoproject
+│               └── AppTest.java
+└── target
+    ├── classes
+    │   └── mydemoproject
+    │       └── App.class
+    ├── generated-sources
+    │   └── annotations
+    ├── generated-test-sources
+    │   └── test-annotations
+    ├── javasample-1.0-SNAPSHOT.jar				(Packaged application)
+    ├── maven-archiver
+    │   └── pom.properties
+    ├── maven-status
+    │   └── maven-compiler-plugin
+    │       ├── compile
+    │       │   └── default-compile
+    │       │       ├── createdFiles.lst
+    │       │       └── inputFiles.lst
+    │       └── testCompile
+    │           └── default-testCompile
+    │               ├── createdFiles.lst
+    │               └── inputFiles.lst
+    ├── surefire-reports						(test reports)
+    │   ├── TEST-mydemoproject.AppTest.xml
+    │   └── mydemoproject.AppTest.txt
+    └── test-classes
+        └── mydemoproject
+            └── AppTest.class
+
+
+-------
+
+mvn install
+
+Installing /home/ec2-user/javasample/target/javasample-1.0-SNAPSHOT.jar to /root/.m2/repository/mydemoproject/javasample/1.0-SNAPSHOT/javasample-1.0-SNAPSHOT.jar
+
+----
+
+mvn clean				--> Deletes the target folder
+
+---
+
+mvn clean install
+
+mvn clean install package
+
+---
+
+================================================
+
+
+cd /opt/
+
+Download apache tomcat: wget https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.52/bin/apache-tomcat-10.1.52.tar.gz
+
+tar -xvzf apache-tomcat-10.1.52.tar.gz 
+
+cd /apache-tomcat-10.1.52/bin
+
+sh startup.sh
+sh shutdown.sh
+
+ln -s /opt/apache-tomcat-10.1.52/bin/startup.sh /usr/bin/tomcatstart
+ln -s /opt/apache-tomcat-10.1.52/bin/shutdown.sh /usr/bin/tomcatstop
+
+tomcatstart		--> to start tomcat from any location
+tomcatstop		--> to stop tomcat from any location
+
+Edit "context.xml" to access the Server Status / Manager App / Host Manager.. 
+
+
+find / -name "context.xml"
+
+vim /opt/apache-tomcat-10.1.52/webapps/host-manager/META-INF/context.xml
+vim /opt/apache-tomcat-10.1.52/webapps/manager/META-INF/context.xml
+
+
+after above step.. Stop and start the tomcat server..
 
 
 
 
+====
 
 
+For example, to add the manager-gui role to a user named tomcat with a password of s3cret, add the following to the config file listed above.
+
+<role rolename="manager-gui"/>
+<user username="tomcat" password="s3cret" roles="manager-gui"/>
+Note that for Tomcat 7 onwards, the roles required to use the manager application were changed from the single manager role to the following four roles. You will need to assign the role(s) required for the functionality you wish to access.
+
+manager-gui - allows access to the HTML GUI and the status pages
+manager-script - allows access to the text interface and the status pages
+manager-jmx - allows access to the JMX proxy and the status pages
+manager-status - allows access to the status pages only
 
 
-
-
-
-
-
+<role rolename="manager-gui"/>
+<role rolename="manager-script"/>
+<role rolename="manager-jmx"/>
+<role rolename="manager-status"/>
+<role rolename="admin-gui"/>
+<user username="tomcat" password="Avinash" roles="manager-gui,manager-script,manager-jmx,manager-status,admin-gui"/>
 
 
