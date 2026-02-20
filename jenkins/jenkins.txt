@@ -158,6 +158,8 @@ Step 4 : WAR is deployed to apache tomcat --> users can access it via browser.
 Download maven : 
 https://dlcdn.apache.org/maven/maven-3/3.9.12/binaries/apache-maven-3.9.12-bin.tar.gz
 
+tar -xvzf apache-maven-3.9.12-bin.tar.gz
+
 mv apache-maven-3.9.12 /opt/
 rm apache-maven-3.9.12-bin.tar.gz 
 
@@ -344,5 +346,47 @@ manager-status - allows access to the status pages only
 <role rolename="manager-status"/>
 <role rolename="admin-gui"/>
 <user username="tomcat" password="Avinash" roles="manager-gui,manager-script,manager-jmx,manager-status,admin-gui"/>
+
+===========
+
+D: 20/02/2026
+
+
+TO deploy package to maven, we need to install 2 pliugins
+
+maven integration
+deploy to container
+
+Create credentials in jenkins server to access tomcat server
+
+
+---
+
+Pipelines:
+
+Declarative Pipeline : Introduced in jenkins 2.x
+
+
+
+pipeline { }
+agent any			--> In which worker you want to run this
+stages {}			--> Contains all stages
+stage ('Name') { }	
+sh 'command'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
