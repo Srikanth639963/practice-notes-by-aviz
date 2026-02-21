@@ -374,6 +374,21 @@ stages {}			--> Contains all stages
 stage ('Name') { }	
 sh 'command'
 
+==============
+
+Sonarqube is an open source tool to inspect our code quality. It supports 30+ prog languages.
+
+Static Code Analysis : Find the bugs without running the code.
+Security vulnerability detections
+Code Smell : Flags maintenability issues.
+Code Coverage : Measures the how much code is tested.
+Quality gate : Blocks the deployment if quality standard are not passed/met.
+
+
+sonarqube stores scan results into postgresql db
+
+
+
 
 
 

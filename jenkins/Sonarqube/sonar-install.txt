@@ -1,0 +1,197 @@
+sudo dnf update -y
+
+sudo dnf install -y \
+  java-21-amazon-corretto-devel \
+  wget \
+  unzip
+
+
+dnf install -y postgresql15 postgresql15-server
+/usr/bin/postgresql-setup --initdb
+systemctl enable --now postgresql
+systemctl status postgresql
+
+
+# Kernel params for Elasticsearch
+
+cat <<EOF >> /etc/sysctl.d/99-sonarqube.conf
+vm.max_map_count=262144
+fs.file-max=65536
+EOF
+
+sysctl --system
+
+# File descriptor and process limits for sonar user
+cat <<EOF >> /etc/security/limits.conf
+sonar   -   nofile  65536
+sonar   -   nproc   4096
+EOF
+
+
+# Replace StrongPassw0rd! with your own strong password
+sudo -u postgres psql -c "CREATE USER sonar WITH PASSWORD 'StrongPassw0rd';"
+sudo -u postgres psql -c "CREATE DATABASE sonarqube OWNER sonar;"
+
+
+
+---
+
+cp /var/lib/pgsql/data/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf.bak
+
+vim /var/lib/pgsql/data/pg_hba.conf
+
+
+#IDENT dont support password, hashing and Remote access.
+#MD5 support remote conenction, username and hashing
+
+---
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     md5
+
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            md5
+
+# IPv6 local connections:
+host    all             all             ::1/128                 md5
+
+# Allow replication connections from localhost, by a user with the
+# replication privilege.
+local   replication     all                                     md5
+host    replication     all             127.0.0.1/32            md5
+host    replication     all             ::1/128                 md5
+
+
+---
+
+systemctl restart postgresql
+systemctl status postgresql
+
+--
+
+#verify DB connectivity
+psql -h 127.0.0.1 -U sonar -d sonarqube -W
+
+--
+
+cd /opt
+
+# Download SonarQube
+wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-25.11.0.114957.zip
+
+# Unzip and rename
+unzip sonarqube-25.11.0.114957.zip
+mv sonarqube-25.11.0.114957 sonarqube
+
+# Create dedicated user and set ownership
+useradd -r -s /bin/false sonar
+chown -R sonar:sonar /opt/sonarqube
+
+
+vim /opt/sonarqube/conf/sonar.properties
+
+---
+# Database config
+sonar.jdbc.url=jdbc:postgresql://localhost/sonarqube
+sonar.jdbc.username=sonar
+sonar.jdbc.password=StrongPassw0rd
+
+# Listen on all interfaces (optional but useful on EC2)
+sonar.web.host=0.0.0.0
+sonar.web.port=9000
+---
+
+
+=============
+
+
+
+#Systemd Service for SonarQube - To Run sonarqube as a service.
+
+cat <<'EOF' > /etc/systemd/system/sonarqube.service
+[Unit]
+Description=SonarQube service
+After=network.target postgresql.service
+
+[Service]
+Type=forking
+User=sonar
+Group=sonar
+ExecStart=/opt/sonarqube/bin/linux-x86-64/sonar.sh start
+ExecStop=/opt/sonarqube/bin/linux-x86-64/sonar.sh stop
+Restart=on-failure
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+---
+
+systemctl daemon-reload
+systemctl enable --now sonarqube
+systemctl status sonarqube
+
+
+---
+
+Now connect to sonarqube server using default cred: admin / admin
+
+Create a local project: portalproject
+
+
+======
+
+Now, In jenkins install below plugins
+
+SonarQube Scanner
+
+--->
+
+Then, navigate to jenkins server --> "systems" --> then search for  "sonarqube server"
+
+Enable environment variable
+
+--> name it as "sonarqube"
+sonarqube url	--> http://172.31.29.20:9000	 
+
+
+--
+
+Sonar dont support username and password authentication, need to generate a token..
+
+navigate to "administrator" --> users and geenrate a token for "administrator"
+
+--> Add a credential in jenkins, name: "sonarqube"
+
+---
+
+Configure Webhook in SonarQube:
+Go to your SonarQube server → Administration → Configuration → Webhooks → Create
+
+Name: jenkins
+
+jenkins url: http://172.31.22.18:8080/sonarqube-webhook/
+
+
+
+---
+
+
+Now configure the pipeline and test to deploy it
+
+
+===========
+
+
+
+
+
+
+
+
+
+
