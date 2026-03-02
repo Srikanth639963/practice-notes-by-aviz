@@ -1,0 +1,247 @@
+
+
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "webserver" {
+  ami           = "ami-051a31ab2f4d498f5"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "WebServer"
+  }
+}
+
+
+---
+count
+---
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "webserver" {
+  count         = 2
+  ami           = "ami-051a31ab2f4d498f5"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "WebServer"
+  }
+}
+
+---
+for_each - 1
+---
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "webserver" {
+  for_each = toset(["dev-Server", "uat-Server", "Prd-Server"])
+  ami           = "ami-051a31ab2f4d498f5"
+  instance_type = "t3.micro"
+  tags = {
+    Name = each.key
+  }
+}
+
+---
+for_each - 2
+---
+provider "aws" {
+  region = "ap-south-1"
+}
+
+locals {
+  servers = {
+    dev = "t3.micro"
+    uat = "t3.small"
+    prd = "t3.small"
+  }
+}
+
+resource "aws_instance" "servers" {
+  for_each = local.servers
+
+  ami           = "ami-051a31ab2f4d498f5"
+  instance_type = each.value
+  tags = {
+    Name        = "${each.key}-server"
+    Environment = each.key
+  }
+
+}
+
+---
+depends_on
+---
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+
+resource "aws_instance" "servers" {
+  ami           = "ami-051a31ab2f4d498f5"
+  instance_type = "t3.micro"
+  tags = {
+    Name        = "Dev-server"
+  }
+}
+
+resource "aws_s3_bucket" "mybucket" {
+  bucket = "my-terraform-bucket-aviz212121"
+  depends_on = [ aws_instance.servers ]
+}
+
+
+---
+provider
+---
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+provider "aws" {
+  region = "us-east-1"
+  alias = "usaregion"
+}
+
+resource "aws_instance" "mumbai-server" {
+  ami           = "ami-051a31ab2f4d498f5"
+  instance_type = "t3.micro"
+  tags = {
+    Name        = "IND-server"
+  }
+}
+
+resource "aws_instance" "usa-server" {
+  provider = aws.usaregion
+  ami           = "ami-0f3caa1cf4417e51b"
+  instance_type = "t3.micro"
+  tags = {
+    Name        = "USA-server"
+  }
+}
+
+---
+Create before destroy
+---
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "mumbai-server" {
+  ami           = "ami-019715e0d74f695be"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "IND-server"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+}
+
+---
+ignore changes
+---
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "mumbai-server" {
+  ami           = "ami-019715e0d74f695be"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "IND-server"
+  }
+
+  lifecycle {
+    ignore_changes = [ instance_type ]
+  }
+
+}
+
+---
+remote-exec to connect the launched instance and execute commands
+---
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "mumbai-server" {
+  ami           = "ami-051a31ab2f4d498f5"
+  instance_type = "t3.micro"
+  vpc_security_group_ids = [ "sg-0aefb72118169d88d" ]
+  key_name = "jenkins-kp"
+
+  connection {
+    type = "ssh"
+    user = "ec2-user"
+    private_key = file("/Users/avizway/Desktop/keypairs/jenkins-kp.pem")
+    host = self.public_ip
+  }
+
+  provisioner "remote-exec" {
+    inline = [ 
+      "sudo yum update -y",
+      "sudo dnf install httpd -y",
+      "sudo systemctl enable httpd --now",
+      "echo '<h1>Welcome to Mumbai Server</h1>' | sudo tee /var/www/html/index.html"
+     ]
+  }
+
+  tags = {
+    Name = "IND-server"
+  }
+}
+
+
+---
+pass comamnds using userdata option
+---
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "mumbai-server" {
+  ami                    = "ami-051a31ab2f4d498f5"
+  instance_type          = "t3.micro"
+  vpc_security_group_ids = ["sg-0aefb72118169d88d"]
+  key_name               = "jenkins-kp"
+
+  user_data = file("${path.module}/userdata.txt")
+
+  tags = {
+    Name = "IND-server"
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

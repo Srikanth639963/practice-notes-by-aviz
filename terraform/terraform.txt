@@ -1,7 +1,5 @@
 
-
 download and unzip.. then copy the file "terraform.msi" --> Create a folder in c drive --> copy this to c:/
-
 
 c:\terraform
 
@@ -14,6 +12,9 @@ Add this as environemnt varibale --> system variables --> path (c:\terraform)
 --> terraform validate	: validate the code syntax errors
 --> terraform fmt		: fomats the traaform code (proper indentations)
 --> terraform plan		: Similar to dryrun. THis displays what resources it is going to create/modify/delete.
+terraform apply			: Create the resources
 
 terraform apply -auto-approve
+
+
 
