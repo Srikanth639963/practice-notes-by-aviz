@@ -16,5 +16,120 @@ terraform apply			: Create the resources
 
 terraform apply -auto-approve
 
+---
+
+replace (formarly taint) : helps to recreate the resources (if it currupts).. 
+It destroys existing resources and then create a brand new resource.. State file updates with new resource info..
+
+terraform apply -replace="aws_instance.mumbai-server"
+
+--
+
+This command identifies the changes happend outside of the terraform : terraform plan -refresh-only
+
+This command update the statefile with current state of the resource: terraform apply -refresh-only
+
+---
+
+terraform plan -refresh-only		--> Detect the change
+terraform apply						--> Ignore the changes and bring resource to actual state
+terraform apply -refresh-only		--> If chnages valid, updates the tfstate file with actual changes
+
+--
+
+Log levels:
+
+TRACE
+DEBUG
+INFO
+WARN
+ERROR
+
+
+export TF_LOG=DEBUG						--> TO set logging
+export TF_LOG_PATH=./terraform.log		--> To set log output path
+
+unset TF_LOG		--> Turn off logging
+
+---
+
+terraform plan -out=ec2plan.tfplan			--> Sends the plan output to tfplan
+
+terraform show ec2plan.tfplan
+
+---
+
+Terraform Statefile: Source of truth. This file contains all the resources and its state managed by terraform.
+
+terraform state list
+
+terraform state show aws_s3_bucket.mybucket
+
+terraform init -migrate-state
+
+terraform force-unlock <ID>	(Emergency cases)
+
+---
+local
+---
+
+terraform {
+  backend "local" {
+    path = "/Users/avizway/Desktop/keypairs/statestore/terraform.tfstate"
+  }
+}
+---
+
+
+---
+s3 remote backend
+---
+
+terraform {
+  backend "s3" {
+    bucket = "terraform-state-store-aviz"
+    key = "mydevstate/terraform.tfstate"
+    region = "ap-south-1"
+    use_lockfile = true
+  }
+}
+
+---
+
+provider version Constraints:
+
+
+terraform init -upgrade				--> Run this after specifying the provider version.
+
+
+
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "6.31.0"
+    }
+  }
+}
+
+
+
+= 5.0.0			--> Exactly same version
+>= 5.0			--> Either 5 or higher
+<= 5.5			--> lower than 5.5 or 5.5
+~> 5.0			--> 5.x only
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
