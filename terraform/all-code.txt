@@ -226,9 +226,127 @@ resource "aws_instance" "mumbai-server" {
 }
 
 
----
 
----
+
+
+==============
+Variables Examples
+=============
+
+
+
+# variable "instance_type" {
+#   type        = string
+#   description = "Enter the EC2 Instance type you want to launch"
+#   default     = "t3.small"
+# }
+
+# variable "instance_type" {
+#   type = list(string)
+#   default = [ "t3.micro", "t3.small" ]
+# }
+
+# variable "instance_type_per_env" {
+#   type = map(string)
+#   default = {
+#     dev  = "t3.micro"
+#     prod = "t3.small"
+#   }
+# }
+
+variable "instance_count" {
+  type        = number
+  description = "Enter the req instances you want to launch"
+  default     = 1
+}
+
+variable "ami_id" {
+  type        = string
+  description = "Enter the AMI ID you want to use for launching instances"
+  default     = "ami-051a31ab2f4d498f5"
+}
+
+variable "enable_stop_protection" {
+  type = bool
+  default = true
+}
+
+variable "region_id" {
+  type = string
+  default = "ap-south-1"
+}
+
+variable "tags" {
+  type = map(string)
+  default = {
+    "Name" = "DevInstance"
+    "Env"  = "Dev"
+  }
+}
+
+===========
+
+varibales test
+
+===========
+
+variable "instance_type" {
+  type        = string
+  description = "Enter the EC2 Instance type you want to launch"
+  default     = "t3.small"
+}
+
+variable "instance_count" {
+  type        = number
+  description = "Enter the req instances you want to launch"
+  default     = 1
+}
+
+variable "ami_id" {
+  type        = string
+  description = "Enter the AMI ID you want to use for launching instances"
+  default     = "ami-051a31ab2f4d498f5"
+}
+
+variable "enable_stop_protection" {
+  type    = bool
+  default = true
+}
+
+variable "region_id" {
+  type    = string
+  default = "ap-south-1"
+}
+
+
+provider "aws" {
+  region = var.region_id
+}
+
+variable "tags" {
+  type = map(string)
+  default = {
+    "Name" = "DevInstance"
+    "Env"  = "Dev"
+  }
+}
+
+variable "key_name" {
+  type    = string
+  default = "jenkins-kp"
+}
+
+resource "aws_instance" "mumbai-server" {
+  ami              = var.ami_id
+  instance_type    = var.instance_type
+  count            = var.instance_count
+  disable_api_stop = var.enable_stop_protection
+  key_name         = var.key_name
+  tags = {
+    Name        = var.tags["Name"]
+    Environment = var.tags["Env"]
+  }
+}
 
 
 

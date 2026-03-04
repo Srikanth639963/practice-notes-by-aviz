@@ -120,13 +120,55 @@ terraform {
 ~> 5.0			--> 5.x only
 
 
+=======
+
+When passing Environment varibales, This is the flow that will have priority
+
+1. CLI Flag			--> terraform apply -var="enable_stop_protection=true"
+2. .tfvars file		--> terraform apply -var-file="dev.tfvars"
+3. Environment var	--> export TF_VAR_instance_type="t3.micro"
+4. defualt value	--> defined inside variables block
+
+=====
+
+workspaces : Each workspace maintains its own statefiles.
+
+terraform workspace list
+
+terraform workspace new dev
+terraform workspace new uat
+terraform workspace new prd
 
 
+terraform workspace select default
+
+terraform workspace select dev
+terraform state list
+terraform apply -var-file="dev.tfvars" -auto-approve
+terraform state list
 
 
+terraform workspace select uat
+terraform apply -var-file="uat.tfvars" -auto-approve
+
+terraform workspace select prd
+terraform apply -var-file="prd.tfvars" -auto-approve
+
+terraform destroy -var-file="prd.tfvars" -auto-approve
 
 
+terraform workspace select uat
+terraform destroy -var-file="uat.tfvars" -auto-approve
 
+terraform workspace select dev
+terraform destroy -var-file="dev.tfvars" -auto-approve
+
+terraform workspace list
+terraform workspace select default
+
+terraform workspace delete dev
+terraform workspace delete uat
+terraform workspace delete prd
 
 
 
