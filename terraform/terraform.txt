@@ -170,6 +170,50 @@ terraform workspace delete dev
 terraform workspace delete uat
 terraform workspace delete prd
 
+==================================
+
+
+
+Outputs:
+
+terraform output
+terraform output -json
+
+my_instance_private_ip = "172.31.43.118"
+my_instance_public_ip = "52.66.148.65"
+my_s3 = "my-terraform-bucket-2024-aviz"
+
+{
+  "my_instance_private_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "172.31.43.118"
+  },
+  "my_instance_public_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "52.66.148.65"
+  },
+  "my_s3": {
+    "sensitive": false,
+    "type": "string",
+    "value": "my-terraform-bucket-2024-aviz"
+  }
+}
+
+
+======
+
+Provider always should be in root module only.
+
+When working with modules, we need to run "terraform init" to initialise the modules..
+
+After adding a new module also, we need to run "terraform init"
+
+
+
+
+
 
 
 
