@@ -348,6 +348,63 @@ resource "aws_instance" "mumbai-server" {
   }
 }
 
+============
+
+data block code to fetch latest amazon linux 2023 image
+
+============
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+data "aws_ami" "al2023" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023*-kernel-6.1-x86_64"]
+  }
+
+  filter {
+    name   = "description"
+    values = ["Amazon Linux 2023*"]
+  }
+}
+
+variable "insatnce_type" {
+    type = string
+}
+
+resource "aws_instance" "example" {
+  ami           = data.aws_ami.al2023.id
+  instance_type = var.insatnce_type
+
+  tags = {
+    Name = "AMI-Pick-Example"
+  }
+}
+
+output "ami_used" {
+  value = data.aws_ami.al2023.id
+  sensitive = true
+}
+
+===========
+
+
+HCP Terraform : app.terraform.io
+
+
+
+
+
+
+
+
+
+
 
 
 
