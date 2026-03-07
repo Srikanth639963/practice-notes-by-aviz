@@ -350,7 +350,7 @@ resource "aws_instance" "mumbai-server" {
 
 ============
 
-data block code to fetch latest amazon linux 2023 image
+data bool code to fetch latest amazon linux 2023 image
 
 ============
 
