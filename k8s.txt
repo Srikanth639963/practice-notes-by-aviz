@@ -83,10 +83,9 @@ eksctl create cluster --name=ekswithavinash --version 1.34 --region ap-south-1 -
 
 
 
-eksctl create cluster --name=ekswithavinash --version 1.34 --region ap-south-1 --zones=ap-south-1a,ap-south-1b --nodegroup-name ng-default --node-type c7i-flex.large --nodes 1 --node-ami-family=AmazonLinux2023 --managed
+eksctl create cluster --name=ekswithavinash --version 1.34 --region ap-south-1 --zones=ap-south-1a,ap-south-1b --nodegroup-name ng-default --node-type c7i-flex.large --nodes 2 --node-ami-family=AmazonLinux2023 --managed
 
 eksctl utils associate-iam-oidc-provider --region ap-south-1 --cluster ekswithavinash --approve
-
 
 ----
 
