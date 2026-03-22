@@ -1,3 +1,6 @@
+sudo mkdir -p /data/artifactory
+sudo chown -R 1030:1030 /data/artifactory
+
 docker rm -f artifactory
 
 docker run -d \
